@@ -5,6 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +19,8 @@ import java.util.Set;
 
 @Component
 public class JwtUtil {
-
+    @Autowired
+    private HttpServletRequest request;
     private Key secretKeyDecoded;
     private static final long EXPIRATION_TIME = 86400000;
 
@@ -65,5 +68,12 @@ public class JwtUtil {
 
     public boolean isTokenInvalid(String token) {
         return invalidatedTokens.contains(token);
+    }
+    public String getTokenFromRequest() {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7); // Remove "Bearer "
+        }
+        return null;
     }
 }
